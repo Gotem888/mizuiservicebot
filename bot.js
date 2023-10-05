@@ -48,7 +48,7 @@ export const bot = new Telegraf(
 bot.use(session());
 let resultArray = [];
 const uri =
-  "mongodb+srv://gotem888:Romanenko123@cluster0.buvkwub.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://gotem888:Romanenko123@cluster0.buvkwub.mongodb.net/?retryWrites=true&w=majority&authSource=admin";
 //
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 export const client = new MongoClient(uri, {
@@ -60,7 +60,7 @@ export const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
-
+console.log(client);
 export const myDB = client.db("mizui_db");
 async function run() {
   try {
@@ -197,86 +197,110 @@ bot
         }
 
         if (ctx.callbackQuery.data === "location") {
-          ctx.answerCbQuery();
-          pastQueryData[0] = "location";
-          const tasks = await GetLocationList(arrLoc, "address");
-          const loc_id = await GetLocationList(arrLoc, "id");
-          let result = [];
-          for (let i = 0; i < tasks.length; i++) {
-            result.push({
-              text: `${tasks[i]}`,
-              callback_data: "locatId" + `${loc_id[i]}`,
-            });
-          }
-
-          const arr = chunkArray(result, 1);
-          arr.push([{ text: "Назад", callback_data: "start" }]);
           try {
-            ctx.telegram.editMessageText(ctx.chat.id, messageId, 0, "Адресс", {
-              reply_markup: {
-                inline_keyboard: arr,
-              },
-            });
-          } catch (e) {
-            console.error(e);
+            ctx.answerCbQuery();
+            pastQueryData[0] = "location";
+            const tasks = await GetLocationList(arrLoc, "address");
+            const loc_id = await GetLocationList(arrLoc, "id");
+            let result = [];
+            for (let i = 0; i < tasks.length; i++) {
+              result.push({
+                text: `${tasks[i]}`,
+                callback_data: "locatId" + `${loc_id[i]}`,
+              });
+            }
+
+            const arr = chunkArray(result, 1);
+            arr.push([{ text: "Назад", callback_data: "start" }]);
+            try {
+              ctx.telegram.editMessageText(
+                ctx.chat.id,
+                messageId,
+                0,
+                "Адресс",
+                {
+                  reply_markup: {
+                    inline_keyboard: arr,
+                  },
+                }
+              );
+            } catch (e) {
+              console.error(e);
+            }
+          } catch (errors) {
+            console.error(errors);
           }
         }
 
         if (ctx.callbackQuery.data === "company") {
-          ctx.answerCbQuery();
-          pastQueryData[0] = "company";
-          const loc_id = GetLocationList(arrLoc, "id");
-          const tasks = GetLocationList(arrLoc, "name");
-          const sect = GetLocationList(arrLoc, "section");
-          let result = [];
-          for (let i = 0; i < tasks.length; i++) {
-            result.push({
-              text: `${tasks[i]}`,
-              callback_data: "locatId" + `${loc_id[i]}`,
-            });
-          }
-          const arr = chunkArray(result, 1);
-          arr.push([{ text: "Назад", callback_data: "start" }]);
           try {
-            bot.telegram.editMessageText(
-              ctx.chat.id,
-              messageId,
-              0,
-              "Организация",
-              {
-                reply_markup: {
-                  inline_keyboard: arr,
-                },
-              }
-            );
-          } catch (e) {
-            console.error(e);
+            ctx.answerCbQuery();
+            pastQueryData[0] = "company";
+            const loc_id = GetLocationList(arrLoc, "id");
+            const tasks = GetLocationList(arrLoc, "name");
+            const sect = GetLocationList(arrLoc, "section");
+            let result = [];
+            for (let i = 0; i < tasks.length; i++) {
+              result.push({
+                text: `${tasks[i]}`,
+                callback_data: "locatId" + `${loc_id[i]}`,
+              });
+            }
+            const arr = chunkArray(result, 1);
+            arr.push([{ text: "Назад", callback_data: "start" }]);
+            try {
+              bot.telegram.editMessageText(
+                ctx.chat.id,
+                messageId,
+                0,
+                "Организация",
+                {
+                  reply_markup: {
+                    inline_keyboard: arr,
+                  },
+                }
+              );
+            } catch (e) {
+              console.error(e);
+            }
+          } catch (orror) {
+            console.error(orror);
           }
         }
 
         async function querySectionData(secData) {
-          pastQueryData[1] = "locatId" + secData;
-          const secTasks = GetSectionList(arrLoc, secData);
-          let res = [];
-          let arr = [];
-          for (let i = 0; i < secTasks.length; i++) {
-            let secName = secTasks[i].title.substring(0, 1);
-            let secId = secTasks[i]._id;
-            res.push({
-              text: "-= " + `${secName}` + " =-",
-              callback_data: "dataSec" + secId,
-            });
-          }
-          arr = chunkArray(res, 1);
-          arr.push([{ text: "Назад", callback_data: pastQueryData[0] }]);
           try {
-            bot.telegram.editMessageText(ctx.chat.id, messageId, 0, "Секция", {
-              reply_markup: {
-                inline_keyboard: arr,
-              },
-            });
-          } catch (e) {
-            console.error(e);
+            pastQueryData[1] = "locatId" + secData;
+            const secTasks = GetSectionList(arrLoc, secData);
+            let res = [];
+            let arr = [];
+            for (let i = 0; i < secTasks.length; i++) {
+              let secName = secTasks[i].title.substring(0, 1);
+              let secId = secTasks[i]._id;
+              res.push({
+                text: "-= " + `${secName}` + " =-",
+                callback_data: "dataSec" + secId,
+              });
+            }
+            arr = chunkArray(res, 1);
+            arr.push([{ text: "Назад", callback_data: pastQueryData[0] }]);
+            try {
+              bot.telegram.editMessageText(
+                ctx.chat.id,
+                messageId,
+                0,
+                "Секция",
+                {
+                  reply_markup: {
+                    inline_keyboard: arr,
+                  },
+                }
+              );
+            } catch (e) {
+              console.error(e);
+            }
+          } catch (error) {
+            console.error(error);
           }
         }
 
@@ -533,7 +557,7 @@ bot.on("callback_query", async (ctx) => {
           ctx.chat.id,
           messageId,
           0,
-          `${card}\n` + "ТО производилось:\n" + `${messageResult}`,
+          `${card}\n` + "ТО проводилось:\n" + `${messageResult}`,
           {
             parse_mode: "HTML",
             reply_markup: {
@@ -576,7 +600,7 @@ bot.on("callback_query", async (ctx) => {
                   ],
                   [
                     {
-                      text: "Назад",
+                      text: "СКРЫТЬ ВСЕ",
                       callback_data: "clear",
                     },
                   ],
