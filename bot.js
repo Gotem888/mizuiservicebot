@@ -48,7 +48,7 @@ export const bot = new Telegraf(
 bot.use(session());
 let resultArray = [];
 const uri =
-  "mongodb+srv://gotem888:Romanenko123@cluster0.buvkwub.mongodb.net/?retryWrites=true&w=majority&authSource=admin";
+  "mongodb+srv://gotem888:Romanenko123@cluster0.buvkwub.mongodb.net/?retryWrites=true&w=majority";
 //
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 export const client = new MongoClient(uri, {
@@ -57,6 +57,7 @@ export const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
+    address: "127.0.0.1:27017",
     deprecationErrors: true,
   },
 });
