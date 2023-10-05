@@ -111,6 +111,7 @@ export function getFaults(info) {
   let faultList = [];
   console.log(faultList);
   let faultResult = [];
+  let arr = [];
   faultList = arrFault.map((e) => {
     console.log(e.elevatorId, info);
     if (e.elevatorId.toString() == info) return e;
@@ -121,16 +122,25 @@ export function getFaults(info) {
     }
   });
   console.log("faultResult", faultResult);
-  let faultArr = {};
-  faultArr = faultResult;
+  let faultArr = arrElevat.map((el) => {
+    if (el.elevatorId.toString() == info) return el.address, el.section;
+  });
+  faultArr.forEach((el) => {
+    if (el != undefined) {
+      arr.push(el);
+    }
+  });
   console.log("faultResult", faultResult);
   const faultCard = (object) => {
     const { _id, elevatorId, isRepair, created_at, text } = object;
+    const { address, section } = arr;
     let isRepairRes = "";
     if (isRepair == false) isRepairRes = "🚨 ";
     else isRepairRes = "✅ " + " УСТРАНЕНО";
     const faultCard =
-      ` ${isRepairRes}\n
+      ` ${address}<br />
+        Секция: ${section}\n
+      ${isRepairRes}\n
       <b>${text}.</b>\n
     Создана: ${created_at.toLocaleString()}.
     ` + _id;
