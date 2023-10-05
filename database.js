@@ -130,7 +130,7 @@ export function getFaults(info) {
       arr.push(el);
     }
   });
-  console.log("faultResult", faultResult);
+  console.log("faultResult", faultResult, arr);
   const faultCard = (object) => {
     const { _id, elevatorId, isRepair, created_at, text } = object;
     const { address, section } = arr;
