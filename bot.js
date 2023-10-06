@@ -2,7 +2,7 @@ import { LOCATION } from "./list.js";
 import { Telegraf } from "telegraf";
 import { Api, TelegramClient } from "telegram";
 import axios from "axios";
-import express from "express";
+import express, { response } from "express";
 import Extra from "telegraf";
 import { session } from "./node_modules/telegraf/lib/session.js";
 
@@ -344,151 +344,45 @@ bot
   )
   .catch(console.dir());
 let faultClaimsMessage = [];
-bot.on("callback_query", async (ctx) => {
-  try {
-    let queryData = ctx.callbackQuery.data;
-    let del = queryData.substring(0, 7);
-    let dataQuery = queryData.substring(7);
-    let delMessOne = "";
-    // console.log(pastQueryData);
 
-    if (del === "dataSec") {
-      ctx.answerCbQuery();
-      pastQueryData[2] = queryData;
-      const tasksEl = await GetElevatorList(arrElevat, dataQuery);
-      let result = [];
-      for (let i = 0; i < tasksEl.length; i++) {
-        let typeElev = "";
-        if (tasksEl[i].elevType == "Passenger") typeElev = "Пассажирский";
-        else if (tasksEl[i].elevType == "Cargo") typeElev = "Грузовой";
-        result.push({
-          text: `${typeElev} ` + ` , ${tasksEl[i].weight}`,
-          callback_data: "dataElv" + `${tasksEl[i]._id}`,
-        });
-      }
-      console.log(result);
-      const arr = chunkArray(result, 1);
-      arr.push([{ text: "Назад", callback_data: pastQueryData[1] }]);
-      bot.telegram.editMessageText(ctx.chat.id, messageId, 0, "Лифт", {
-        reply_markup: {
-          inline_keyboard: arr,
-        },
-      });
-    }
+bot
+  .on("callback_query", async (ctx) => {
+    try {
+      let queryData = ctx.callbackQuery.data;
+      let del = queryData.substring(0, 7);
+      let dataQuery = queryData.substring(7);
+      let delMessOne = "";
+      // console.log(pastQueryData);
 
-    if (del === "dataElv") {
-      ctx.answerCbQuery();
-      pastQueryData[3] = queryData;
-      const card = await getElevatorInfo(dataQuery);
-      let result = bot.telegram.editMessageText(
-        ctx.chat.id,
-        messageId,
-        0,
-        `${card}`,
-        {
-          parse_mode: "HTML",
-          reply_markup: {
-            inline_keyboard: [
-              [
-                {
-                  text: "Тех-Обслуживание",
-                  callback_data: "techMnt" + `${dataQuery}`,
-                },
-              ],
-              [
-                {
-                  text: "Заявка неисправности",
-                  callback_data: "damgAdd" + `${dataQuery}`,
-                },
-              ],
-              [{ text: "Назад", callback_data: pastQueryData[2] }],
-            ],
-          },
+      if (del === "dataSec") {
+        ctx.answerCbQuery();
+        pastQueryData[2] = queryData;
+        const tasksEl = await GetElevatorList(arrElevat, dataQuery);
+        let result = [];
+        for (let i = 0; i < tasksEl.length; i++) {
+          let typeElev = "";
+          if (tasksEl[i].elevType == "Passenger") typeElev = "Пассажирский";
+          else if (tasksEl[i].elevType == "Cargo") typeElev = "Грузовой";
+          result.push({
+            text: `${typeElev} ` + ` , ${tasksEl[i].weight}`,
+            callback_data: "dataElv" + `${tasksEl[i]._id}`,
+          });
         }
-      );
-      // console.log(result, `${dataQuery}`);
-    }
-    if (del === "damgAdd") {
-      ctx.answerCbQuery();
-      pastQueryData[4] = queryData;
-      const card = await getElevatorInfo(dataQuery);
-      try {
-        await ctx.telegram.editMessageText(
-          ctx.chat.id,
-          messageId,
-          0,
-          `${card}`,
-          {
-            parse_mode: "HTML",
-            reply_markup: {
-              inline_keyboard: [
-                [
-                  {
-                    text: "Просмотр заявок",
-                    callback_data: "dmgLook" + `${dataQuery}`,
-                  },
-                ],
-                [
-                  {
-                    text: "Добавить заявку",
-                    callback_data: "addDamg" + `${dataQuery}`,
-                  },
-                ],
-                [
-                  {
-                    text: "Назад",
-                    callback_data: pastQueryData[3],
-                  },
-                ],
-              ],
-            },
-          }
-        );
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    //===========================================================================================
-
-    if (del === "chFault") {
-      ctx.answerCbQuery();
-      await updateFaultClaim(dataQuery);
-      ctx.sendMessage("Статус заявки 'Исправлено'").then((r) => {
-        setTimeout(() => {
-          ctx.deleteMessage(r.message_id);
-        }, 5000);
-      });
-    }
-    if (del === "deFault") {
-      ctx.answerCbQuery();
-      console.log(dataQuery);
-      await deleteFault(dataQuery);
-      await ctx.telegram
-        .sendMessage(ctx.chat.id, "Заявка успешно удалена")
-        .then((r) => {
-          setTimeout(() => {
-            ctx.deleteMessage(r.message_id);
-            let resp = faultClaimsMessage;
-            // console.log(resp);
-            resp.forEach((e) => {
-              console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
-              try {
-                let res = ctx.telegram.deleteMessage(ctx.chat.id, e);
-                console.log(res);
-              } catch (e) {
-                console.error(e);
-              }
-            });
-          }, 5000);
+        console.log(result);
+        const arr = chunkArray(result, 1);
+        arr.push([{ text: "Назад", callback_data: pastQueryData[1] }]);
+        bot.telegram.editMessageText(ctx.chat.id, messageId, 0, "Лифт", {
+          reply_markup: {
+            inline_keyboard: arr,
+          },
         });
-    }
+      }
 
-    if (del === "techMnt") {
-      ctx.answerCbQuery();
-      pastQueryData[4] = queryData;
-      const card = await getElevatorInfo(dataQuery);
-      try {
-        await ctx.telegram.editMessageText(
+      if (del === "dataElv") {
+        ctx.answerCbQuery();
+        pastQueryData[3] = queryData;
+        const card = await getElevatorInfo(dataQuery);
+        let result = bot.telegram.editMessageText(
           ctx.chat.id,
           messageId,
           0,
@@ -499,189 +393,317 @@ bot.on("callback_query", async (ctx) => {
               inline_keyboard: [
                 [
                   {
-                    text: "Отметки о проведённом ТО",
-                    callback_data: "lookFor" + `${dataQuery}`,
+                    text: "Тех-Обслуживание",
+                    callback_data: "techMnt" + `${dataQuery}`,
                   },
                 ],
                 [
                   {
-                    text: "Добавить отметку о ТО",
-                    callback_data: "addTOdb" + `${dataQuery}`,
+                    text: "Заявка неисправности",
+                    callback_data: "damgAdd" + `${dataQuery}`,
                   },
                 ],
-                [
-                  {
-                    text: "Назад",
-                    callback_data: pastQueryData[3],
-                  },
-                ],
+                [{ text: "Назад", callback_data: pastQueryData[2] }],
               ],
             },
           }
         );
-      } catch (err) {
-        console.error(err);
+        // console.log(result, `${dataQuery}`);
       }
-    }
-    if (del === "addTOdb") {
-      ctx.answerCbQuery();
-      const techTime = new Date().getTime();
-      const elevatorId = dataQuery;
-      const techCard = {
-        elevatorId: elevatorId,
-        created_at: techTime,
-      };
-      await addTechInfoToDB(techCard);
-      try {
-        await client.connect();
-        arrTech = await downloadTechInfo();
-        await client.close();
-        ctx
-          .sendMessage("Отметка о ТО успешно добавлена")
-          .then((r) => {
-            setTimeout(() => {
-              ctx.deleteMessage(r.message_id);
-            }, 5000);
-          })
-          .catch((err) => console.log(err));
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    if (del === "lookFor") {
-      try {
+      if (del === "damgAdd") {
         ctx.answerCbQuery();
-        const messageResult = await getTechInfo(dataQuery);
+        pastQueryData[4] = queryData;
         const card = await getElevatorInfo(dataQuery);
-        // console.log(messageResult);
-        await bot.telegram.editMessageText(
-          ctx.chat.id,
-          messageId,
-          0,
-          `${card}\n` + "ТО проводилось:\n" + `${messageResult}`,
-          {
-            parse_mode: "HTML",
-            reply_markup: {
-              inline_keyboard: [
-                [{ text: "Назад", callback_data: pastQueryData[4] }],
-              ],
-            },
-          }
-        );
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    if (del === "dmgLook") {
-      try {
-        ctx.answerCbQuery();
-        // console.log(dataQuery);
-        // function queryFaultInfo(elevId) {
-        // console.log("test", someInfo);
-        let faultList = await getFaults(dataQuery);
-        for await (let e of faultList) {
-          console.log(typeof e, e);
-          await ctx.telegram
-            .sendMessage(ctx.chat.id, e.substring(0, e.length - 24), {
+        try {
+          await ctx.telegram.editMessageText(
+            ctx.chat.id,
+            messageId,
+            0,
+            `${card}`,
+            {
               parse_mode: "HTML",
               reply_markup: {
                 inline_keyboard: [
                   [
                     {
-                      text: "УСТРАНЕНО",
-                      callback_data:
-                        "chFault" + `${e.substring(e.length - 24)}`,
-                    },
-                    {
-                      text: "Удалить",
-                      callback_data:
-                        "deFault" + `${e.substring(e.length - 24)}`,
+                      text: "Просмотр заявок",
+                      callback_data: "dmgLook" + `${dataQuery}`,
                     },
                   ],
                   [
                     {
-                      text: "СКРЫТЬ ВСЕ",
-                      callback_data: "clear",
+                      text: "Добавить заявку",
+                      callback_data: "addDamg" + `${dataQuery}`,
+                    },
+                  ],
+                  [
+                    {
+                      text: "Назад",
+                      callback_data: pastQueryData[3],
                     },
                   ],
                 ],
               },
-            })
-            .then((r) => {
-              faultClaimsMessage.push(r.message_id);
-              console.log(faultClaimsMessage);
-            });
-          console.log(e.substring(e.length - 24));
-        }
-      } catch (errr) {
-        console.error(errr);
-      }
-    }
-    if (ctx.callbackQuery.data === "clear") {
-      let res = [];
-      res = faultClaimsMessage;
-      faultClaimsMessage = [];
-      console.log("metka", res);
-      res.forEach(async (e) => {
-        console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
-        try {
-          let res = await ctx.telegram.deleteMessage(ctx.chat.id, e);
-          console.log(res);
+            }
+          );
         } catch (err) {
           console.error(err);
         }
-      });
-    }
-    if (del === "addDamg") {
-      ctx.telegram
-        .sendMessage(ctx.chat.id, "Опишите неисправность и отправте сообщение")
-        .then((r) => {
-          delMessOne = r.message_id;
-        })
-        .catch((err) => console.log(err));
+      }
+      //===========================================================================================
 
-      bot
-        .on("text", async (ctx) => {
-          ctx.session = { taskText: `${ctx.message.text}` };
-          const result = {
-            isRepair: false,
-            text: `${ctx.message.text}`,
-            elevatorId: dataQuery,
-            created_at: new Date().getTime(),
-          };
-          await addFaultClaimToDB(result);
-          ctx.telegram
-            .editMessageText(
-              ctx.chat.id,
-              delMessOne,
-              0,
-              "Заявка успешно добавлена"
-            )
+      if (del === "chFault") {
+        ctx.answerCbQuery();
+        await updateFaultClaim(dataQuery);
+        ctx.sendMessage("Статус заявки 'Исправлено'").then((r) => {
+          setTimeout(() => {
+            ctx.deleteMessage(r.message_id);
+          }, 5000);
+        });
+      }
+      if (del === "deFault") {
+        ctx.answerCbQuery();
+        console.log(dataQuery);
+        await deleteFault(dataQuery);
+        await ctx.telegram
+          .sendMessage(ctx.chat.id, "Заявка успешно удалена")
+          .then((r) => {
+            setTimeout(() => {
+              ctx.deleteMessage(r.message_id);
+              let resp = faultClaimsMessage;
+              // console.log(resp);
+              resp.forEach((e) => {
+                console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
+                try {
+                  let res = ctx.telegram.deleteMessage(ctx.chat.id, e);
+                  console.log(res);
+                } catch (e) {
+                  console.error(e);
+                }
+              });
+            }, 5000);
+          });
+      }
+
+      if (del === "techMnt") {
+        ctx.answerCbQuery();
+        pastQueryData[4] = queryData;
+        const card = await getElevatorInfo(dataQuery);
+        try {
+          await ctx.telegram.editMessageText(
+            ctx.chat.id,
+            messageId,
+            0,
+            `${card}`,
+            {
+              parse_mode: "HTML",
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    {
+                      text: "Отметки о проведённом ТО",
+                      callback_data: "lookFor" + `${dataQuery}`,
+                    },
+                  ],
+                  [
+                    {
+                      text: "Добавить отметку о ТО",
+                      callback_data: "addTOdb" + `${dataQuery}`,
+                    },
+                  ],
+                  [
+                    {
+                      text: "Назад",
+                      callback_data: pastQueryData[3],
+                    },
+                  ],
+                ],
+              },
+            }
+          );
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      if (del === "addTOdb") {
+        ctx.answerCbQuery();
+        const techTime = new Date().getTime();
+        const elevatorId = dataQuery;
+        const techCard = {
+          elevatorId: elevatorId,
+          created_at: techTime,
+        };
+        await addTechInfoToDB(techCard);
+        try {
+          await client.connect();
+          arrTech = await downloadTechInfo();
+          await client.close();
+          ctx
+            .sendMessage("Отметка о ТО успешно добавлена")
             .then((r) => {
               setTimeout(() => {
-                ctx.deleteMessage(delMessOne);
-                delMessOne = "";
+                ctx.deleteMessage(r.message_id);
               }, 5000);
             })
             .catch((err) => console.log(err));
-          await client.connect();
-          try {
-            arrFault = await downloadFaultInfo();
-            await client.close();
-          } catch (e) {
-            console.error(e);
-          }
-          console.log(
-            `A document was inserted with the _id: ${result.insertedId}`
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      if (del === "lookFor") {
+        try {
+          ctx.answerCbQuery();
+          const messageResult = await getTechInfo(dataQuery);
+          const card = await getElevatorInfo(dataQuery);
+          // console.log(messageResult);
+          await bot.telegram.editMessageText(
+            ctx.chat.id,
+            messageId,
+            0,
+            `${card}\n` +
+              "<b>ТО проводилось:</b>\n" +
+              `<i>${messageResult}</i>`,
+            {
+              parse_mode: "HTML",
+              reply_markup: {
+                inline_keyboard: [
+                  [{ text: "Назад", callback_data: pastQueryData[4] }],
+                ],
+              },
+            }
           );
-        })
-        .catch(console.dir);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      if (del === "dmgLook") {
+        try {
+          ctx.answerCbQuery();
+          // console.log(dataQuery);
+          // function queryFaultInfo(elevId) {
+          // console.log("test", someInfo);
+          let faultList = await getFaults(dataQuery);
+          let inlineButtons = [];
+          for await (let e of faultList) {
+            console.log(typeof e, e);
+            if (e.substring(e.length - 1) == "n") {
+              inlineButtons.push(
+                {
+                  text: "УСТРАНЕНО",
+                  callback_data:
+                    "chFault" + `${e.substring(e.length - 25, e.length - 1)}`,
+                },
+                {
+                  text: "Удалить",
+                  callback_data:
+                    "deFault" + `${e.substring(e.length - 25, e.length - 1)}`,
+                }
+              );
+            } else if (e.substring(e.length - 1) == "y") {
+              inlineButtons.push({
+                text: "Удалить",
+                callback_data:
+                  "deFault" + `${e.substring(e.length - 25, e.length - 1)}`,
+              });
+            }
+            await ctx.telegram
+              .sendMessage(ctx.chat.id, e.substring(0, e.length - 25), {
+                parse_mode: "HTML",
+                reply_markup: {
+                  inline_keyboard: [
+                    inlineButtons,
+                    [
+                      {
+                        text: "СКРЫТЬ ВСЕ",
+                        callback_data: "clear",
+                      },
+                    ],
+                  ],
+                },
+              })
+              .then((r) => {
+                faultClaimsMessage.push(r.message_id);
+                console.log(faultClaimsMessage);
+                inlineButtons = [];
+              });
+            console.log(e.substring(e.length - 25));
+          }
+        } catch (errr) {
+          console.error(errr);
+        }
+      }
+      if (ctx.callbackQuery.data === "clear") {
+        let res = faultClaimsMessage;
+        let resBackUp;
+        if (res != []) {
+          resBackUp = res;
+        } else res = resBackUp;
+        console.log("metka", res, resBackUp);
+        res.forEach(async (e) => {
+          console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
+          try {
+            let res = await ctx.telegram.deleteMessage(ctx.chat.id, e);
+            console.log(res);
+            if (res) faultClaimsMessage = [];
+          } catch (err) {
+            console.error(err.response);
+          }
+        });
+      }
+      if (del === "addDamg") {
+        ctx.telegram
+          .sendMessage(
+            ctx.chat.id,
+            "Опишите неисправность и отправте сообщение"
+          )
+          .then((r) => {
+            delMessOne = r.message_id;
+          })
+          .catch((err) => console.log(err));
+
+        bot
+          .on("text", async (ctx) => {
+            ctx.session = { taskText: `${ctx.message.text}` };
+            const result = {
+              isRepair: false,
+              text: `${ctx.message.text}`,
+              elevatorId: dataQuery,
+              created_at: new Date().getTime(),
+            };
+            await addFaultClaimToDB(result);
+            ctx.telegram
+              .editMessageText(
+                ctx.chat.id,
+                delMessOne,
+                0,
+                "Заявка успешно добавлена"
+              )
+              .then((r) => {
+                setTimeout(() => {
+                  ctx.deleteMessage(delMessOne);
+                  delMessOne = "";
+                }, 5000);
+              })
+              .catch((err) => console.log(err));
+            await client.connect();
+            try {
+              arrFault = await downloadFaultInfo();
+              await client.close();
+            } catch (e) {
+              console.error(e);
+            }
+            console.log(
+              `A document was inserted with the _id: ${result.insertedId}`
+            );
+          })
+          .catch(console.dir);
+      }
+    } catch (erro) {
+      console.error(erro);
     }
-  } catch (erro) {
-    console.error(erro);
-  }
-});
+  })
+  .catch(console.dir);
 
 async function deleteFault(info) {
   try {
@@ -694,7 +716,7 @@ async function deleteFault(info) {
     console.log("Заявка успешно удалена", result);
     arrFault = await downloadFaultInfo();
     await client.close();
-    faultClaimsMessage = [];
+    // faultClaimsMessage = [];
   } catch (err) {
     console.dir(err);
   }

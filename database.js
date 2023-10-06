@@ -109,11 +109,8 @@ export function getElevatorInfo(info) {
 
 export function getFaults(info) {
   let faultList = [];
-  console.log(faultList);
   let faultResult = [];
-  let arr = [];
   faultList = arrFault.map((e) => {
-    console.log(e.elevatorId, info);
     if (e.elevatorId.toString() == info) return e;
   });
   faultList.forEach((e) => {
@@ -121,29 +118,41 @@ export function getFaults(info) {
       faultResult.push(e);
     }
   });
-  console.log("faultResult", faultResult);
-  let faultArr = arrElevat.map((el) => {
-    if (el.elevatorId.toString() == info) return el.address, el.section;
-  });
-  faultArr.forEach((el) => {
-    if (el != undefined) {
-      arr.push(el);
-    }
-  });
-  console.log("faultResult", faultResult, arr);
+  let elevList = idsElev.flat();
+  let result = [];
+
+  elevList
+    .map((e) => {
+      if (e._id == info) return e;
+    })
+    .forEach((e) => {
+      if (e != undefined) result.push(e);
+    });
+  let arr = {};
+  arr = result[0];
+  console.log(arr);
+
   const faultCard = (object) => {
     const { _id, elevatorId, isRepair, created_at, text } = object;
-    const { address, section } = arr;
+
     let isRepairRes = "";
-    if (isRepair == false) isRepairRes = "🚨 ";
-    else isRepairRes = "✅ " + " УСТРАНЕНО";
+    let isRep = "";
+    if (isRepair == false) {
+      isRepairRes = "🚨 ";
+      isRep = "n";
+    } else {
+      isRepairRes = "✅ " + " УСТРАНЕНО";
+      isRep = "y";
+    }
     const faultCard =
-      ` ${address}<br />
-        Секция: ${section}\n
-      ${isRepairRes}\n
+      `
+       ${isRepairRes} <b><i>${arr.address}</i></b>
+       Секция: <b><i>${arr.section}</i></b>\n
       <b>${text}.</b>\n
     Создана: ${created_at.toLocaleString()}.
-    ` + _id;
+    ` +
+      _id +
+      isRep;
     return faultCard;
   };
 
