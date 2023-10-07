@@ -184,6 +184,7 @@ bot
         });
         if (ctx.callbackQuery.data === "start") {
           try {
+            ctx.deleteMessage(messageId);
             const resp = ctx.telegram
               .sendMessage(ctx.chat.id, "Найти по...", {
                 reply_markup: {
