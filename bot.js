@@ -664,38 +664,41 @@ bot
 
         bot
           .on("text", async (ctx) => {
-            ctx.session = { taskText: `${ctx.message.text}` };
+            ctx.session = {
+              taskText: `${ctx.message.text}`,
+              taskId: `${ctx.message.message_id}`,
+            };
             const result = {
               isRepair: false,
               text: `${ctx.message.text}`,
               elevatorId: dataQuery,
               created_at: new Date().getTime(),
             };
+
             await addFaultClaimToDB(result);
             ctx.telegram
               .editMessageText(
                 ctx.chat.id,
                 delMessOne,
                 0,
-                "Заявка успешно добавлена"
+                "Заявка успешно добавлена, обновление базы"
               )
-              .then((r) => {
-                setTimeout(() => {
+              .then(async (r) => {
+                await client.connect();
+                try {
+                  arrFault = await downloadFaultInfo();
+                  await client.close();
+                  ctx.deleteMessage(ctx.session.taskId);
                   ctx.deleteMessage(delMessOne);
                   delMessOne = "";
-                }, 5000);
+                } catch (e) {
+                  console.error(e);
+                }
+                console.log(
+                  `A document was inserted with the _id: ${result.insertedId}`
+                );
               })
               .catch((err) => console.log(err));
-            await client.connect();
-            try {
-              arrFault = await downloadFaultInfo();
-              await client.close();
-            } catch (e) {
-              console.error(e);
-            }
-            console.log(
-              `A document was inserted with the _id: ${result.insertedId}`
-            );
           })
           .catch(console.dir);
       }

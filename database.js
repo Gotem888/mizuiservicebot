@@ -141,7 +141,7 @@ export function getFaults(info) {
       isRepairRes = "🚨 ";
       isRep = "n";
     } else {
-      isRepairRes = "✅ " + " УСТРАНЕНО";
+      isRepairRes = "✅ ";
       isRep = "y";
     }
     const options = {
