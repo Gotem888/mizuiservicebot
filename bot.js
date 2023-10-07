@@ -111,18 +111,23 @@ let messageId = "";
 if (messageId != "") messageId = "";
 bot.start((ctx) => {
   ctx.telegram
-    .sendMessage(ctx.chat.id, "Welcome", {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: "Start",
-              callback_data: "start",
-            },
+    .sendPhoto(
+      ctx.chat.id,
+      "AgACAgIAAxkBAAIbB2UhCr7FnRRYH3cy_ruqXHzrKzoSAAJqzzEbx_QISe4Oc1tU2C8HAQADAgADcwADMAQ",
+      {
+        caption: "Welcome",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Start",
+                callback_data: "start",
+              },
+            ],
           ],
-        ],
-      },
-    })
+        },
+      }
+    )
     .then((m) => {
       messageId = m.message_id;
       let userId = uniqueUserList(userList);
@@ -155,6 +160,7 @@ bot
       "location",
       "company",
       "start",
+      "startOne",
       "dataSec",
       "dataElv",
       "text",
@@ -178,20 +184,49 @@ bot
         });
         if (ctx.callbackQuery.data === "start") {
           try {
-            const resp = ctx.telegram.editMessageText(
-              ctx.chat.id,
-              messageId,
-              0,
-              "Найти по...",
-              {
+            const resp = ctx.telegram
+              .sendMessage(ctx.chat.id, "Найти по...", {
                 reply_markup: {
                   inline_keyboard: [
                     [{ text: "-----Адресс-----", callback_data: "location" }],
                     [{ text: "----Заказщик----", callback_data: "company" }],
                   ],
                 },
-              }
-            );
+              })
+              .then((m) => {
+                messageId = m.message_id;
+                let userId = uniqueUserList(userList);
+                for (let i = 0; i < userId.length; i++) {
+                  if (userId[i].user == ctx.chat.id)
+                    userId[i].mess = m.message_id;
+                }
+                userList.push({ user: ctx.chat.id, mess: m.message_id });
+              });
+          } catch (err) {
+            console.error(err);
+          }
+        }
+
+        if (ctx.callbackQuery.data === "startOne") {
+          try {
+            ctx.telegram
+              .editMessageText(ctx.chat.id, messageId, 0, "Найти по...", {
+                reply_markup: {
+                  inline_keyboard: [
+                    [{ text: "-----Адресс-----", callback_data: "location" }],
+                    [{ text: "----Заказщик----", callback_data: "company" }],
+                  ],
+                },
+              })
+              .then((m) => {
+                messageId = m.message_id;
+                let userId = uniqueUserList(userList);
+                for (let i = 0; i < userId.length; i++) {
+                  if (userId[i].user == ctx.chat.id)
+                    userId[i].mess = m.message_id;
+                }
+                userList.push({ user: ctx.chat.id, mess: m.message_id });
+              });
           } catch (err) {
             console.error(err);
           }
@@ -212,7 +247,7 @@ bot
             }
 
             const arr = chunkArray(result, 1);
-            arr.push([{ text: "Назад", callback_data: "start" }]);
+            arr.push([{ text: "Назад", callback_data: "startOne" }]);
             try {
               ctx.telegram.editMessageText(
                 ctx.chat.id,
@@ -248,7 +283,7 @@ bot
               });
             }
             const arr = chunkArray(result, 1);
-            arr.push([{ text: "Назад", callback_data: "start" }]);
+            arr.push([{ text: "Назад", callback_data: "startOne" }]);
             try {
               bot.telegram.editMessageText(
                 ctx.chat.id,
@@ -344,7 +379,9 @@ bot
   )
   .catch(console.dir());
 let faultClaimsMessage = [];
-
+bot.on((ctx) => {
+  console.log(ctx.message);
+});
 bot
   .on("callback_query", async (ctx) => {
     try {
