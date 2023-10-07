@@ -501,23 +501,23 @@ bot
       if (del === "deFault") {
         ctx.answerCbQuery();
         console.log(dataQuery);
+        let resp = faultClaimsMessage;
+        // console.log(resp);
+        resp.forEach((e) => {
+          console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
+          try {
+            let res = ctx.telegram.deleteMessage(ctx.chat.id, e);
+            console.log(res);
+          } catch (e) {
+            console.error(e);
+          }
+        });
         await deleteFault(dataQuery);
         await ctx.telegram
           .sendMessage(ctx.chat.id, "Заявка успешно удалена")
           .then((r) => {
             setTimeout(() => {
               ctx.deleteMessage(r.message_id);
-              let resp = faultClaimsMessage;
-              // console.log(resp);
-              resp.forEach((e) => {
-                console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
-                try {
-                  let res = ctx.telegram.deleteMessage(ctx.chat.id, e);
-                  console.log(res);
-                } catch (e) {
-                  console.error(e);
-                }
-              });
             }, 5000);
           });
       }
