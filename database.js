@@ -145,9 +145,8 @@ export function getFaults(info) {
       isRep = "y";
     }
     const options = {
-      weekday: "long",
       year: "numeric",
-      month: "long",
+      month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "numeric",
@@ -159,7 +158,7 @@ export function getFaults(info) {
        ${isRepairRes} <b><i>${arr.address}</i></b>
        Секция: <b><i>${arr.section}</i></b>\n
       <b>${text}.</b>\n
-    Создана: ${created_at.toLocaleString("en-GB", options)}.
+    ${created_at.toLocaleString("en-GB", options)}.
     ` +
       _id +
       isRep;
@@ -203,9 +202,18 @@ export async function getTechInfo(dataQuery) {
     if (i != undefined) arr.push(i);
   });
   const techCard = (object) => {
+    const options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      timeZone: "europe/kiev",
+    };
     const { _id, elevatorId, created_at, notes } = object;
     const techCard = `
-    ${created_at.toLocaleString()}.\n`;
+    ${created_at.toLocaleString("en-GB", options)}.\n`;
     return techCard;
   };
   techList = arr.reduce((acc, item) => {
