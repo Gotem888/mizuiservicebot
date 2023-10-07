@@ -144,12 +144,22 @@ export function getFaults(info) {
       isRepairRes = "✅ " + " УСТРАНЕНО";
       isRep = "y";
     }
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      timeZone: "europe/kiev",
+    };
     const faultCard =
       `
        ${isRepairRes} <b><i>${arr.address}</i></b>
        Секция: <b><i>${arr.section}</i></b>\n
       <b>${text}.</b>\n
-    Создана: ${created_at.toLocaleString()}.
+    Создана: ${created_at.toLocaleString("en-GB", options)}.
     ` +
       _id +
       isRep;
