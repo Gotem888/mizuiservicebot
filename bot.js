@@ -681,9 +681,12 @@ bot
         res.forEach(async (e) => {
           console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
           try {
-            let res = await ctx.telegram.deleteMessage(ctx.chat.id, e);
-            console.log(res);
-            if (res) faultClaimsMessage = [];
+            let resp = await ctx.telegram.deleteMessage(ctx.chat.id, e);
+            console.log(resp);
+            if (resp) {
+              faultClaimsMessage = [];
+              resBackUp = [];
+            }
           } catch (err) {
             console.error(err.response);
           }
