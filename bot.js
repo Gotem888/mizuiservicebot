@@ -702,48 +702,47 @@ bot
           )
           .then((r) => {
             delMessOne = r.message_id;
-          })
-          .catch((err) => console.log(err));
+            bot
+              .on("text", async (ctx) => {
+                ctx.session = {
+                  taskText: `${ctx.message.text}`,
+                  taskId: `${ctx.message.message_id}`,
+                };
+                const result = {
+                  isRepair: false,
+                  text: `${ctx.message.text}`,
+                  elevatorId: dataQuery,
+                  created_at: new Date().getTime(),
+                };
 
-        bot
-          .on("text", async (ctx) => {
-            ctx.session = {
-              taskText: `${ctx.message.text}`,
-              taskId: `${ctx.message.message_id}`,
-            };
-            const result = {
-              isRepair: false,
-              text: `${ctx.message.text}`,
-              elevatorId: dataQuery,
-              created_at: new Date().getTime(),
-            };
-
-            await addFaultClaimToDB(result);
-            ctx.telegram
-              .editMessageText(
-                ctx.chat.id,
-                delMessOne,
-                0,
-                "Заявка успешно добавлена, обновление базы"
-              )
-              .then(async (r) => {
-                await client.connect();
-                try {
-                  arrFault = await downloadFaultInfo();
-                  await client.close();
-                  ctx.deleteMessage(ctx.session.taskId);
-                  ctx.deleteMessage(delMessOne);
-                  delMessOne = "";
-                } catch (e) {
-                  console.error(e);
-                }
-                console.log(
-                  `A document was inserted with the _id: ${result.insertedId}`
-                );
+                await addFaultClaimToDB(result);
+                ctx.telegram
+                  .editMessageText(
+                    ctx.chat.id,
+                    delMessOne,
+                    0,
+                    "Заявка успешно добавлена, обновление базы"
+                  )
+                  .then(async (r) => {
+                    await client.connect();
+                    try {
+                      arrFault = await downloadFaultInfo();
+                      await client.close();
+                      ctx.deleteMessage(ctx.session.taskId);
+                      ctx.deleteMessage(delMessOne);
+                      delMessOne = "";
+                    } catch (e) {
+                      console.error(e);
+                    }
+                    console.log(
+                      `A document was inserted with the _id: ${result.insertedId}`
+                    );
+                  })
+                  .catch((err) => console.error(err));
               })
-              .catch((err) => console.log(err));
+              .catch(console.dir);
           })
-          .catch(console.dir);
+          .catch((err) => console.error(err));
       }
     } catch (erro) {
       console.error(erro);
@@ -799,3 +798,6 @@ export async function updateFaultClaim(info) {
 
 run().catch(console.dir);
 bot.launch();
+
+process.once("SIGINT", () => bot.stop("SIGINT"));
+process.once("SIGTERM", () => bot.stop("SIGTERM"));
