@@ -688,9 +688,10 @@ bot
               resBackUp = [];
             }
           } catch (err) {
-            console.error(err.response);
+            console.error(err);
           }
         });
+        res = [];
       }
       if (del === "addDamg") {
         ctx.telegram
