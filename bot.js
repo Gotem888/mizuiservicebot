@@ -617,6 +617,7 @@ bot
 
       if (del === "dmgLook") {
         try {
+          faultClaimsMessage = [];
           ctx.answerCbQuery();
           // console.log(dataQuery);
           // function queryFaultInfo(elevId) {
