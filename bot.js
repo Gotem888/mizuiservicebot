@@ -142,18 +142,8 @@ bot.start((ctx) => {
     });
 });
 
-// bot.action("deFault", function (ctx) {
-//   let queryData = ctx.callbackQuery.data;
-//   console.log(ctx.callbackQuery.data);
-//   if (queryData.substring(0, 6) === "deFault") {
-//     console.log(ctx.callbackQuery.data);
-//     //   let info = ctx.callbackQuery.data;
-//     //   let faultId = info.substring(info.length(-24));
-//     //   deleteFault(faultId);
-//   }
-// });
 let pastQueryData = [];
-
+let fuckingId = [];
 bot
   .action(
     [
@@ -380,16 +370,14 @@ bot
   )
   .catch(console.dir());
 let faultClaimsMessage = [];
-bot.on((ctx) => {
-  console.log(ctx.message);
-});
+bot.on((ctx) => {});
 bot
   .on("callback_query", async (ctx) => {
     try {
       let queryData = ctx.callbackQuery.data;
       let del = queryData.substring(0, 7);
       let dataQuery = queryData.substring(7);
-      let delMessOne = "";
+
       // console.log(pastQueryData);
 
       if (del === "dataSec") {
@@ -446,7 +434,6 @@ bot
             },
           }
         );
-        // console.log(result, `${dataQuery}`);
       }
       if (del === "damgAdd") {
         ctx.answerCbQuery();
@@ -496,14 +483,13 @@ bot
         ctx.sendMessage("Статус заявки 'Исправлено'").then((r) => {
           setTimeout(() => {
             ctx.deleteMessage(r.message_id);
-          }, 5000);
+          }, 3000);
         });
       }
       if (del === "deFault") {
         ctx.answerCbQuery();
         console.log(dataQuery);
         let resp = faultClaimsMessage;
-        // console.log(resp);
         resp.forEach((e) => {
           console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
           try {
@@ -519,7 +505,7 @@ bot
           .then((r) => {
             setTimeout(() => {
               ctx.deleteMessage(r.message_id);
-            }, 5000);
+            }, 3000);
           });
       }
 
@@ -581,7 +567,7 @@ bot
             .then((r) => {
               setTimeout(() => {
                 ctx.deleteMessage(r.message_id);
-              }, 5000);
+              }, 3000);
             })
             .catch((err) => console.log(err));
         } catch (err) {
@@ -593,7 +579,6 @@ bot
           ctx.answerCbQuery();
           const messageResult = await getTechInfo(dataQuery);
           const card = await getElevatorInfo(dataQuery);
-          // console.log(messageResult);
           await bot.telegram.editMessageText(
             ctx.chat.id,
             messageId,
@@ -619,54 +604,62 @@ bot
         try {
           faultClaimsMessage = [];
           ctx.answerCbQuery();
-          // console.log(dataQuery);
-          // function queryFaultInfo(elevId) {
-          // console.log("test", someInfo);
           let faultList = await getFaults(dataQuery);
+          console.log(typeof faultList, faultList);
           let inlineButtons = [];
-          for await (let e of faultList) {
-            console.log(typeof e, e);
-            if (e.substring(e.length - 1) == "n") {
-              inlineButtons.push(
-                {
-                  text: "УСТРАНЕНО",
-                  callback_data:
-                    "chFault" + `${e.substring(e.length - 25, e.length - 1)}`,
-                },
-                {
+          if (faultList.length < 1) {
+            ctx.telegram
+              .sendMessage(ctx.chat.id, "Заявки отсутствуют")
+              .then((r) => {
+                setTimeout(() => {
+                  ctx.deleteMessage(r.message_id);
+                }, 3000);
+              });
+          } else {
+            for await (let e of faultList) {
+              console.log(typeof e, e);
+              if (e.substring(e.length - 1) == "n") {
+                inlineButtons.push(
+                  {
+                    text: "УСТРАНЕНО",
+                    callback_data:
+                      "chFault" + `${e.substring(e.length - 25, e.length - 1)}`,
+                  },
+                  {
+                    text: "Удалить",
+                    callback_data:
+                      "deFault" + `${e.substring(e.length - 25, e.length - 1)}`,
+                  }
+                );
+              } else if (e.substring(e.length - 1) == "y") {
+                inlineButtons.push({
                   text: "Удалить",
                   callback_data:
                     "deFault" + `${e.substring(e.length - 25, e.length - 1)}`,
-                }
-              );
-            } else if (e.substring(e.length - 1) == "y") {
-              inlineButtons.push({
-                text: "Удалить",
-                callback_data:
-                  "deFault" + `${e.substring(e.length - 25, e.length - 1)}`,
-              });
-            }
-            await ctx.telegram
-              .sendMessage(ctx.chat.id, e.substring(0, e.length - 25), {
-                parse_mode: "HTML",
-                reply_markup: {
-                  inline_keyboard: [
-                    inlineButtons,
-                    [
-                      {
-                        text: "СКРЫТЬ ВСЕ",
-                        callback_data: "clear",
-                      },
+                });
+              }
+              await ctx.telegram
+                .sendMessage(ctx.chat.id, e.substring(0, e.length - 25), {
+                  parse_mode: "HTML",
+                  reply_markup: {
+                    inline_keyboard: [
+                      inlineButtons,
+                      [
+                        {
+                          text: "СКРЫТЬ ВСЕ",
+                          callback_data: "clear",
+                        },
+                      ],
                     ],
-                  ],
-                },
-              })
-              .then((r) => {
-                faultClaimsMessage.push(r.message_id);
-                console.log(faultClaimsMessage);
-                inlineButtons = [];
-              });
-            console.log(e.substring(e.length - 25));
+                  },
+                })
+                .then((r) => {
+                  faultClaimsMessage.push(r.message_id);
+                  console.log(faultClaimsMessage);
+                  inlineButtons = [];
+                });
+              console.log(e.substring(e.length - 25));
+            }
           }
         } catch (errr) {
           console.error(errr);
@@ -695,54 +688,62 @@ bot
         res = [];
       }
       if (del === "addDamg") {
-        ctx.telegram
-          .sendMessage(
-            ctx.chat.id,
-            "Опишите неисправность и отправте сообщение"
-          )
-          .then((r) => {
-            delMessOne = r.message_id;
-            bot
-              .on("text", async (ctx) => {
-                ctx.session = {
-                  taskText: `${ctx.message.text}`,
-                  taskId: `${ctx.message.message_id}`,
-                };
-                const result = {
-                  isRepair: false,
-                  text: `${ctx.message.text}`,
-                  elevatorId: dataQuery,
-                  created_at: new Date().getTime(),
-                };
-
-                await addFaultClaimToDB(result);
-                ctx.telegram
-                  .editMessageText(
-                    ctx.chat.id,
-                    delMessOne,
-                    0,
-                    "Заявка успешно добавлена, обновление базы"
-                  )
-                  .then(async (r) => {
-                    await client.connect();
-                    try {
-                      arrFault = await downloadFaultInfo();
-                      await client.close();
-                      ctx.deleteMessage(ctx.session.taskId);
-                      ctx.deleteMessage(delMessOne);
-                      delMessOne = "";
-                    } catch (e) {
-                      console.error(e);
-                    }
-                    console.log(
-                      `A document was inserted with the _id: ${result.insertedId}`
-                    );
-                  })
-                  .catch((err) => console.error(err));
-              })
-              .catch(console.dir);
-          })
-          .catch((err) => console.error(err));
+        try {
+          await ctx.telegram
+            .sendMessage(
+              ctx.chat.id,
+              "Опишите неисправность и отправте сообщение"
+            )
+            .then((r) => {
+              console.log("fuckingId before:", fuckingId);
+              fuckingId.push(r.message_id);
+              console.log("fuckingId after:", fuckingId);
+              bot
+                .on("text", async (ctx) => {
+                  ctx.session = {
+                    taskText: `${ctx.message.text}`,
+                    taskId: `${ctx.message.message_id}`,
+                  };
+                  const result = {
+                    isRepair: false,
+                    text: `${ctx.message.text}`,
+                    elevatorId: dataQuery,
+                    created_at: new Date().getTime(),
+                  };
+                  await addFaultClaimToDB(result);
+                  try {
+                    await ctx.telegram
+                      .editMessageText(
+                        ctx.chat.id,
+                        fuckingId[-0],
+                        0,
+                        "Заявка успешно добавлена, обновление базы"
+                      )
+                      .then(async (r) => {
+                        await client.connect();
+                        try {
+                          arrFault = await downloadFaultInfo();
+                          await client.close();
+                          await ctx.deleteMessage(ctx.session.taskId);
+                          await ctx.deleteMessage(fuckingId[-0]);
+                        } catch (e) {
+                          console.error(e);
+                        }
+                        console.log(
+                          `A document was inserted with the _id: ${result.insertedId}`
+                        );
+                        fuckingId = [];
+                      })
+                      .catch((err) => console.error(err));
+                  } catch (e) {
+                    console.error(e);
+                  }
+                })
+                .catch(console.dir);
+            });
+        } catch (err) {
+          console.error(err);
+        }
       }
     } catch (erro) {
       console.error(erro);
@@ -761,7 +762,6 @@ async function deleteFault(info) {
     console.log("Заявка успешно удалена", result);
     arrFault = await downloadFaultInfo();
     await client.close();
-    // faultClaimsMessage = [];
   } catch (err) {
     console.dir(err);
   }
@@ -781,23 +781,14 @@ export async function updateFaultClaim(info) {
     );
     console.log(`A document was updated successfully`, result);
     arrFault = await downloadFaultInfo();
-    // await faultColl.updateOne({ _id: info }, { $set: { isRepair: true } });
     await client.close();
   } catch (err) {
     console.error(err);
   }
 }
 
-// bot.on("callback_query", async (ctx) => {
-//   let queryData = ctx.callbackQuery.data;
-//   let del = queryData.substring(0, 7);
-//   let dataQuery = queryData.substring(7);
-//   console.log(del, dataQuery);
-//   ctx.answerCbQuery();
-// });
-
 run().catch(console.dir);
-bot.launch();
+bot.launch().catch(console.dir);
 
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));

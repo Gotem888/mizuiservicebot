@@ -120,6 +120,7 @@ export async function addFaultClaimToDB(object) {
     `A document was adding successfully with _id: ${result.insertedId}`
   );
   await client.close();
+  return true;
 }
 
 export async function addTechInfoToDB(object) {

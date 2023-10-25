@@ -96,8 +96,8 @@ export function getElevatorInfo(info) {
   else doorBack = "Нет";
   // const head = getElevatorLocation(result2, info);
   const card = `
-  '${address}
-  Секция: <b>${section}</b>
+  '<b><i>${address}</i></b>
+  <i>Секция:</i> <b>${section}</b>
 
   <b>${typeElev}</b>\n
   Грузоподъёмность: <b>${weight}</b>kg.
