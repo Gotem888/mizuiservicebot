@@ -720,8 +720,8 @@ bot
                         "Заявка успешно добавлена, обновление базы"
                       )
                       .then(async (r) => {
-                        await client.connect();
                         try {
+                          await client.connect();
                           arrFault = await downloadFaultInfo();
                           await client.close();
                           await ctx.deleteMessage(ctx.session.taskId);
