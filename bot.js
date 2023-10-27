@@ -712,29 +712,21 @@ bot
                   };
                   await addFaultClaimToDB(result);
                   try {
-                    await ctx.telegram
-                      .editMessageText(
-                        ctx.chat.id,
-                        fuckingId[-0],
-                        0,
-                        "Заявка успешно добавлена, обновление базы"
-                      )
-                      .then(async (r) => {
-                        try {
-                          await client.connect();
-                          arrFault = await downloadFaultInfo();
-                          await client.close();
-                          await ctx.deleteMessage(ctx.session.taskId);
-                          await ctx.deleteMessage(fuckingId[-0]);
-                        } catch (e) {
-                          console.error(e);
-                        }
-                        console.log(
-                          `A document was inserted with the _id: ${result.insertedId}`
-                        );
-                        fuckingId = [];
-                      })
-                      .catch((err) => console.error(err));
+                    await ctx.telegram.editMessageText(
+                      ctx.chat.id,
+                      fuckingId[-0],
+                      0,
+                      "Заявка успешно добавлена, обновление базы"
+                    );
+                    await client.connect();
+                    arrFault = await downloadFaultInfo();
+                    await client.close();
+                    await ctx.deleteMessage(ctx.session.taskId);
+                    await ctx.deleteMessage(fuckingId[-0]);
+                    console.log(
+                      `A document was inserted with the _id: ${result.insertedId}`
+                    );
+                    fuckingId = [];
                   } catch (e) {
                     console.error(e);
                   }
