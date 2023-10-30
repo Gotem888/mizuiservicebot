@@ -87,7 +87,8 @@ export function getElevatorInfo(info) {
 
   // console.log(arr, result);
 
-  const { elevType, weight, floors, light, section, address, backdoor } = arr;
+  const { elevType, weight, floors, light, section, address, backdoor, model } =
+    arr;
   let typeElev = "";
   let doorBack = "";
   if (elevType == "Passenger") typeElev = "Пассажирский";
@@ -103,7 +104,9 @@ export function getElevatorInfo(info) {
   Грузоподъёмность: <b>${weight}</b>kg.
   Этажность: <b>${floors}</b>эт.
   Задняя дверь: ${doorBack}.
-  Размер лампы: ${light} .\n`;
+  Размер лампы: ${light} .
+  Модель: ${model}.\n`;
+
   return card;
 }
 
