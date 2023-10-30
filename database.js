@@ -105,7 +105,7 @@ export function getElevatorInfo(info) {
   Этажность: <b>${floors}</b>эт.
   Задняя дверь: ${doorBack}.
   Размер лампы: ${light} .
-  Модель: ${model}.\n`;
+  Модель: <b>${model}</b>.\n`;
 
   return card;
 }
