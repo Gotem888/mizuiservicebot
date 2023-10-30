@@ -87,40 +87,46 @@ run().catch(console.dir);
 
 bot.command("coin", (ctx) => {
   let result = Math.random();
-  if (result > 0.5) ctx.reply("Орёл").then((r) => {
-    setTimeout(() => {
-      ctx.deleteMessage(r.message_id);
-    }, 3000);
-  });
-  else ctx.reply("Решка").then((r) => {
-    setTimeout(() => {
-      ctx.deleteMessage(r.message_id);
-    }, 3000);
-  });
+  if (result > 0.5)
+    ctx.reply("Орёл").then((r) => {
+      setTimeout(() => {
+        ctx.deleteMessage(r.message_id);
+      }, 3000);
+    });
+  else
+    ctx.reply("Решка").then((r) => {
+      setTimeout(() => {
+        ctx.deleteMessage(r.message_id);
+      }, 3000);
+    });
 });
 
 bot.command("8ball", (ctx) => {
   let result = Math.random();
-  if (result <= 0.25) ctx.reply("Нет")..then((r) => {
-    setTimeout(() => {
-      ctx.deleteMessage(r.message_id);
-    }, 3000);
-  });
-  else if (result <= 0.5) ctx.reply("Не расчитывай на это").then((r) => {
-    setTimeout(() => {
-      ctx.deleteMessage(r.message_id);
-    }, 3000);
-  });
-  else if (result < 0.75) ctx.reply("Очень возможно!").then((r) => {
-    setTimeout(() => {
-      ctx.deleteMessage(r.message_id);
-    }, 3000);
-  });
-  else if (result >= 0.75) ctx.reply("ДА!!!").then((r) => {
-    setTimeout(() => {
-      ctx.deleteMessage(r.message_id);
-    }, 3000);
-  });
+  if (result <= 0.25)
+    ctx.reply("Нет").then((r) => {
+      setTimeout(() => {
+        ctx.deleteMessage(r.message_id);
+      }, 3000);
+    });
+  else if (result <= 0.5)
+    ctx.reply("Не расчитывай на это").then((r) => {
+      setTimeout(() => {
+        ctx.deleteMessage(r.message_id);
+      }, 3000);
+    });
+  else if (result < 0.75)
+    ctx.reply("Очень возможно!").then((r) => {
+      setTimeout(() => {
+        ctx.deleteMessage(r.message_id);
+      }, 3000);
+    });
+  else if (result >= 0.75)
+    ctx.reply("ДА!!!").then((r) => {
+      setTimeout(() => {
+        ctx.deleteMessage(r.message_id);
+      }, 3000);
+    });
 });
 
 export const idsElev = arrElevat.map((e) => {
