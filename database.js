@@ -87,8 +87,18 @@ export function getElevatorInfo(info) {
 
   // console.log(arr, result);
 
-  const { elevType, weight, floors, light, section, address, backdoor, model } =
-    arr;
+  const {
+    elevType,
+    weight,
+    floors,
+    light,
+    section,
+    address,
+    backdoor,
+    model,
+    mechanic,
+    mechanicPhone,
+  } = arr;
   let typeElev = "";
   let doorBack = "";
   if (elevType == "Passenger") typeElev = "Пассажирский";
@@ -105,7 +115,9 @@ export function getElevatorInfo(info) {
   Этажность: <b>${floors}</b>эт.
   Задняя дверь: ${doorBack}.
   Размер лампы: ${light} .
-  Модель: <b>${model}</b>.\n`;
+  Модель: <b>${model}</b>.
+  Механик: <b><i>${mechanic}</i></b>.
+  Телефон механика: <b>${mechanicPhone}</b>\n`;
 
   return card;
 }
@@ -149,7 +161,7 @@ export function getFaults(info) {
     }
     const options = {
       year: "numeric",
-      month: "short",
+      month: "long",
       day: "numeric",
       hour: "numeric",
       minute: "numeric",
