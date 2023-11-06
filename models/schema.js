@@ -38,6 +38,9 @@ const elevatorSchema = new Schema({
     type: Date,
     default: null,
   },
+  model: String,
+  mechanic: String,
+  mechanicPhone: String,
 });
 
 const sectionSchema = new Schema({

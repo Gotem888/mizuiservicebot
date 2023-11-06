@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { generateLocationData } from "./location.js";
 import { generateElevatorData } from "./elevator.js";
-import { LOCATION } from "../list.js";
+import { LOCATION, LOCATIONDEN } from "../list.js";
 import { myDB, client } from "../bot.js";
 import {
   Elevator,
@@ -82,7 +82,7 @@ export async function downloadFaultInfo() {
 }
 
 export async function addElevatorToDB() {
-  const elevator = generateElevatorData(LOCATION);
+  const elevator = generateElevatorData(LOCATIONDEN);
   const elevColl = myDB.collection("elevators");
   for (let ele of elevator) {
     const addingElev = await Elevator(ele);
@@ -91,7 +91,7 @@ export async function addElevatorToDB() {
   }
 }
 export async function addLocationToDB() {
-  const location = generateLocationData(LOCATION);
+  const location = generateLocationData(LOCATIONDEN);
   const locationColl = myDB.collection("locations");
   for (let loc of location) {
     const addingLoc = await Location(loc);
@@ -101,7 +101,7 @@ export async function addLocationToDB() {
 }
 
 export async function addSectionToDB() {
-  const section = generateSectionData(LOCATION);
+  const section = generateSectionData(LOCATIONDEN);
   const secColl = myDB.collection("sections");
   // await Section.create(section);
   for (let sec of section) {

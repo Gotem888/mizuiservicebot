@@ -1,4 +1,4 @@
-import { LOCATION } from "./list.js";
+import { LOCATION, LOCATIONDEN } from "./list.js";
 import { Telegraf } from "telegraf";
 import { Api, TelegramClient } from "telegram";
 import axios from "axios";
@@ -72,6 +72,9 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+    // await addElevatorToDB();
+    // await addLocationToDB();
+    // await addSectionToDB();
   } finally {
     await client.close();
   }
@@ -199,6 +202,19 @@ bot
     ],
     async (ctx) => {
       try {
+        let faultSec = [];
+        arrElevat.map((e) => {
+          e.elevators.forEach((z) => {
+            for (let f of arrFault) {
+              if (
+                f.elevatorId.toString() == z._id.toString() &&
+                f.isRepair == false
+                // &&
+              )
+                faultSec.push(e._id);
+            }
+          });
+        });
         uniqueUserList(userList).map((e) => {
           if (e.user == ctx.chat.id) messageId = e.mess;
         });
@@ -260,9 +276,25 @@ bot
             const tasks = await GetLocationList(arrLoc, "address");
             const loc_id = await GetLocationList(arrLoc, "id");
             let result = [];
+            let faultLoc = [];
+            arrLoc.map((e) => {
+              e.sections.forEach((x) => {
+                for (let f of faultSec) {
+                  if (f._id.toString() == x._id.toString())
+                    faultLoc.push(e._id);
+                }
+              });
+            });
+            console.log(arrLoc);
+            let locationData = "";
             for (let i = 0; i < tasks.length; i++) {
+              locationData = `${tasks[i]}`;
+              for (let l of faultLoc) {
+                if (loc_id[i].toString() == l._id.toString())
+                  locationData = " 🚨 " + `${tasks[i]}`;
+              }
               result.push({
-                text: `${tasks[i]}`,
+                text: `${locationData}`,
                 callback_data: "locatId" + `${loc_id[i]}`,
               });
             }
@@ -331,11 +363,17 @@ bot
             const secTasks = GetSectionList(arrLoc, secData);
             let res = [];
             let arr = [];
+            let sectionData = "";
             for (let i = 0; i < secTasks.length; i++) {
               let secName = secTasks[i].title.substring(0, 1);
               let secId = secTasks[i]._id;
+              sectionData = "-= " + `${secName}` + " =-";
+              for (let t of faultSec) {
+                if (secId.toString() == t._id.toString())
+                  sectionData = " 🚨 " + "-= " + `${secName}` + " =-";
+              }
               res.push({
-                text: "-= " + `${secName}` + " =-",
+                text: `${sectionData}`,
                 callback_data: "dataSec" + secId,
               });
             }
@@ -400,16 +438,14 @@ bot
   )
   .catch(console.dir());
 let faultClaimsMessage = [];
-bot.on((ctx) => {});
 bot
   .on("callback_query", async (ctx) => {
+    let queryData = ctx.callbackQuery.data;
+    let del = queryData.substring(0, 7);
+    let dataQuery = queryData.substring(7);
+
+    // console.log(pastQueryData);
     try {
-      let queryData = ctx.callbackQuery.data;
-      let del = queryData.substring(0, 7);
-      let dataQuery = queryData.substring(7);
-
-      // console.log(pastQueryData);
-
       if (del === "dataSec") {
         ctx.answerCbQuery();
         pastQueryData[2] = queryData;
@@ -419,6 +455,18 @@ bot
           let typeElev = "";
           if (tasksEl[i].elevType == "Passenger") typeElev = "Пассажирский";
           else if (tasksEl[i].elevType == "Cargo") typeElev = "Грузовой";
+          for (let e of arrFault) {
+            console.log(e.isRepair, e.elevatorId.toString(), tasksEl[i]._id);
+            if (e.elevatorId.toString() == tasksEl[i]._id.toString()) {
+              if (e.isRepair == false) {
+                if (tasksEl[i].elevType == "Passenger")
+                  typeElev = " 🚨 " + "Пассажирский";
+                else if (tasksEl[i].elevType == "Cargo")
+                  typeElev = " 🚨 " + "Грузовой";
+              }
+            }
+            console.log(typeElev);
+          }
           result.push({
             text: `${typeElev} ` + ` , ${tasksEl[i].weight}`,
             callback_data: "dataElv" + `${tasksEl[i]._id}`,
@@ -718,54 +766,58 @@ bot
         res = [];
       }
       if (del === "addDamg") {
-        try {
-          await ctx.telegram
-            .sendMessage(
-              ctx.chat.id,
-              "Опишите неисправность и отправте сообщение"
-            )
-            .then((r) => {
-              console.log("fuckingId before:", fuckingId);
-              fuckingId.push(r.message_id);
-              console.log("fuckingId after:", fuckingId);
-              bot
-                .on("text", async (ctx) => {
-                  ctx.session = {
-                    taskText: `${ctx.message.text}`,
-                    taskId: `${ctx.message.message_id}`,
-                  };
-                  const result = {
-                    isRepair: false,
-                    text: `${ctx.message.text}`,
-                    elevatorId: dataQuery,
-                    created_at: new Date().getTime(),
-                  };
-                  await addFaultClaimToDB(result);
-                  try {
-                    await ctx.telegram.editMessageText(
-                      ctx.chat.id,
-                      fuckingId[-0],
-                      0,
-                      "Заявка успешно добавлена, обновление базы"
-                    );
-                    await client.connect();
-                    arrFault = await downloadFaultInfo();
-                    await client.close();
-                    await ctx.deleteMessage(ctx.session.taskId);
-                    await ctx.deleteMessage(fuckingId[-0]);
-                    console.log(
-                      `A document was inserted with the _id: ${result.insertedId}`
-                    );
-                    fuckingId = [];
-                  } catch (e) {
-                    console.error(e);
-                  }
-                })
-                .catch(console.dir);
+        await ctx.telegram
+          .sendMessage(
+            ctx.chat.id,
+            "Опишите неисправность и отправте сообщение"
+          )
+          .then((r) => {
+            console.log("fuckingId before:", fuckingId);
+            fuckingId.push(r.message_id);
+            fuckingId.push(dataQuery);
+            console.log("fuckingId after:", fuckingId);
+            console.log(dataQuery);
+          })
+          .then((response) => {
+            bot.on("text", async (ctx) => {
+              ctx.session = {
+                taskText: `${ctx.message.text}`,
+                taskId: `${ctx.message.message_id}`,
+              };
+              dataQuery = queryData.substring(7);
+              let result = {
+                isRepair: false,
+                text: `${ctx.message.text}`,
+                elevatorId: `${fuckingId[1]}`,
+                created_at: new Date().getTime(),
+              };
+              console.log(fuckingId[1]);
+              await addFaultClaimToDB(result).then(async (sec_response) => {
+                console.log(sec_response);
+                try {
+                  await ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    fuckingId[-0],
+                    0,
+                    "Заявка успешно добавлена, обновление базы"
+                  );
+                  await client.connect();
+                  arrFault = await downloadFaultInfo();
+                  await client.close();
+                  await ctx.deleteMessage(ctx.session.taskId);
+                  await ctx.deleteMessage(fuckingId[-0]);
+                  console.log(
+                    `A document was inserted with the _id: ${result.insertedId}`
+                  );
+                  fuckingId = [];
+                  dataQuery = "";
+                } catch (e) {
+                  console.error(e);
+                }
+              });
             });
-        } catch (err) {
-          console.error(err);
-        }
+          })
+          .catch(console.dir);
       }
     } catch (erro) {
       console.error(erro);

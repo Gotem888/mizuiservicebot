@@ -76,6 +76,9 @@ export const addElevator = (Object) => {
     floors,
     faultClaim,
     maintenance,
+    model,
+    mechanic,
+    mechanicPhone,
   } = Object;
 
   let elev = {
@@ -88,6 +91,9 @@ export const addElevator = (Object) => {
     backdoor: `${backDoor}`,
     floors: `${floors}`,
     title: `${section}_${id}`,
+    model: `${model}`,
+    mechanic: `${mechanic}`,
+    mechanicPhone: `${mechanicPhone}`,
   };
   // console.log();
   return elev;
