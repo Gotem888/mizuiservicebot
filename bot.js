@@ -197,6 +197,9 @@ bot
       "locatId64fbceb0a93d3ba2ccba1db9",
       "locatId64fbceb0a93d3ba2ccba1dba",
       "locatId64fbceb0a93d3ba2ccba1dbb",
+      "locatId6548d10a6579b0f58c9934f1",
+      "locatId6548d10a6579b0f58c9934f3",
+      "locatId6548d10a6579b0f58c9934f6",
       //sections id
       "deFault",
     ],
@@ -428,6 +431,15 @@ bot
             break;
           case `${"locatId64fbceb0a93d3ba2ccba1dbb"}`:
             querySectionData("64fbceb0a93d3ba2ccba1dbb");
+            break;
+          case `${"locatId6548d10a6579b0f58c9934f1"}`:
+            querySectionData("6548d10a6579b0f58c9934f1");
+            break;
+          case `${"locatId6548d10a6579b0f58c9934f3"}`:
+            querySectionData("6548d10a6579b0f58c9934f3");
+            break;
+          case `${"locatId6548d10a6579b0f58c9934f6"}`:
+            querySectionData("6548d10a6579b0f58c9934f6");
             break;
         }
       } catch (err) {
