@@ -61,7 +61,6 @@ export const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
-console.log(client);
 export const myDB = client.db("mizui_db");
 async function run() {
   try {
@@ -72,14 +71,13 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
-    // await addElevatorToDB();
-    // await addLocationToDB();
-    // await addSectionToDB();
   } finally {
     await client.close();
   }
 }
-
+// await addElevatorToDB();
+// await addLocationToDB();
+// await addSectionToDB();
 export let arrElevat = await downloadElevatorInfo();
 // console.log(typeof arrElevat, arrElevat);
 export let arrFault = await downloadFaultInfo();
@@ -187,7 +185,6 @@ bot
       "dataSec",
       "dataElv",
       "text",
-      "locatId64fbceafa93d3ba2ccba1db2",
       "locatId64fbceafa93d3ba2ccba1db3",
       "locatId64fbceafa93d3ba2ccba1db4",
       "locatId64fbceb0a93d3ba2ccba1db6",
@@ -197,9 +194,8 @@ bot
       "locatId64fbceb0a93d3ba2ccba1db9",
       "locatId64fbceb0a93d3ba2ccba1dba",
       "locatId64fbceb0a93d3ba2ccba1dbb",
-      "locatId6548d10a6579b0f58c9934f1",
-      "locatId6548d10a6579b0f58c9934f3",
-      "locatId6548d10a6579b0f58c9934f6",
+      "locatId6548e13b8cee72c0e7d59d5f",
+      "locatId6548e13b8cee72c0e7d59d60",
       //sections id
       "deFault",
     ],
@@ -302,6 +298,7 @@ bot
             }
 
             const arr = chunkArray(result, 1);
+            console.log(arr);
             arr.push([{ text: "Назад", callback_data: "startOne" }]);
             try {
               ctx.telegram.editMessageText(
@@ -402,9 +399,6 @@ bot
         }
 
         switch (ctx.callbackQuery.data) {
-          case `${"locatId64fbceafa93d3ba2ccba1db2"}`:
-            querySectionData("64fbceafa93d3ba2ccba1db2");
-            break;
           case `${"locatId64fbceafa93d3ba2ccba1db3"}`:
             querySectionData("64fbceafa93d3ba2ccba1db3");
             break;
@@ -432,14 +426,11 @@ bot
           case `${"locatId64fbceb0a93d3ba2ccba1dbb"}`:
             querySectionData("64fbceb0a93d3ba2ccba1dbb");
             break;
-          case `${"locatId6548d10a6579b0f58c9934f1"}`:
-            querySectionData("6548d10a6579b0f58c9934f1");
+          case `${"locatId6548e13b8cee72c0e7d59d5f"}`:
+            querySectionData("6548e13b8cee72c0e7d59d5f");
             break;
-          case `${"locatId6548d10a6579b0f58c9934f3"}`:
-            querySectionData("6548d10a6579b0f58c9934f3");
-            break;
-          case `${"locatId6548d10a6579b0f58c9934f6"}`:
-            querySectionData("6548d10a6579b0f58c9934f6");
+          case `${"locatId6548e13b8cee72c0e7d59d60"}`:
+            querySectionData("6548e13b8cee72c0e7d59d60");
             break;
         }
       } catch (err) {

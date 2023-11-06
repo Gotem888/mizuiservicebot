@@ -12,6 +12,7 @@ export function chunkArray(array, chunk) {
 }
 
 export function GetLocationList(object, info) {
+  console.log(object, info);
   let result = [];
   let arr = [];
   result = object.map((e) => {
