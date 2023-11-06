@@ -285,7 +285,6 @@ bot
                 }
               });
             });
-            console.log(arrLoc);
             let locationData = "";
             for (let i = 0; i < tasks.length; i++) {
               locationData = `${tasks[i]}`;
@@ -443,8 +442,6 @@ bot
     let queryData = ctx.callbackQuery.data;
     let del = queryData.substring(0, 7);
     let dataQuery = queryData.substring(7);
-
-    // console.log(pastQueryData);
     try {
       if (del === "dataSec") {
         ctx.answerCbQuery();
@@ -456,7 +453,6 @@ bot
           if (tasksEl[i].elevType == "Passenger") typeElev = "Пассажирский";
           else if (tasksEl[i].elevType == "Cargo") typeElev = "Грузовой";
           for (let e of arrFault) {
-            console.log(e.isRepair, e.elevatorId.toString(), tasksEl[i]._id);
             if (e.elevatorId.toString() == tasksEl[i]._id.toString()) {
               if (e.isRepair == false) {
                 if (tasksEl[i].elevType == "Passenger")
@@ -465,14 +461,12 @@ bot
                   typeElev = " 🚨 " + "Грузовой";
               }
             }
-            console.log(typeElev);
           }
           result.push({
             text: `${typeElev} ` + ` , ${tasksEl[i].weight}`,
             callback_data: "dataElv" + `${tasksEl[i]._id}`,
           });
         }
-        console.log(result);
         const arr = chunkArray(result, 1);
         arr.push([{ text: "Назад", callback_data: pastQueryData[1] }]);
         bot.telegram.editMessageText(ctx.chat.id, messageId, 0, "Лифт", {
@@ -566,13 +560,10 @@ bot
       }
       if (del === "deFault") {
         ctx.answerCbQuery();
-        console.log(dataQuery);
         let resp = faultClaimsMessage;
         resp.forEach((e) => {
-          console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
           try {
             let res = ctx.telegram.deleteMessage(ctx.chat.id, e);
-            console.log(res);
           } catch (e) {
             console.error(e);
           }
@@ -683,7 +674,6 @@ bot
           faultClaimsMessage = [];
           ctx.answerCbQuery();
           let faultList = await getFaults(dataQuery);
-          console.log(typeof faultList, faultList);
           let inlineButtons = [];
           if (faultList.length < 1) {
             ctx.telegram
@@ -695,7 +685,6 @@ bot
               });
           } else {
             for await (let e of faultList) {
-              console.log(typeof e, e);
               if (e.substring(e.length - 1) == "n") {
                 inlineButtons.push(
                   {
@@ -733,10 +722,8 @@ bot
                 })
                 .then((r) => {
                   faultClaimsMessage.push(r.message_id);
-                  console.log(faultClaimsMessage);
                   inlineButtons = [];
                 });
-              console.log(e.substring(e.length - 25));
             }
           }
         } catch (errr) {
@@ -749,12 +736,10 @@ bot
         if (res != []) {
           resBackUp = res;
         } else res = resBackUp;
-        console.log("metka", res, resBackUp);
+        // console.log("metka", res, resBackUp);
         res.forEach(async (e) => {
-          console.log(`chat_id: ${ctx.chat.id}, message_id: ${e}`);
           try {
             let resp = await ctx.telegram.deleteMessage(ctx.chat.id, e);
-            console.log(resp);
             if (resp) {
               faultClaimsMessage = [];
               resBackUp = [];
@@ -772,11 +757,8 @@ bot
             "Опишите неисправность и отправте сообщение"
           )
           .then((r) => {
-            console.log("fuckingId before:", fuckingId);
             fuckingId.push(r.message_id);
             fuckingId.push(dataQuery);
-            console.log("fuckingId after:", fuckingId);
-            console.log(dataQuery);
           })
           .then((response) => {
             bot.on("text", async (ctx) => {
@@ -791,9 +773,7 @@ bot
                 elevatorId: `${fuckingId[1]}`,
                 created_at: new Date().getTime(),
               };
-              console.log(fuckingId[1]);
               await addFaultClaimToDB(result).then(async (sec_response) => {
-                console.log(sec_response);
                 try {
                   await ctx.telegram.editMessageText(
                     ctx.chat.id,
@@ -830,7 +810,6 @@ async function deleteFault(info) {
     await client.connect();
     const faultColl = myDB.collection("faultClaims");
     const removeFault = await FaultClaim({ _id: info });
-    console.log(removeFault);
 
     const result = await faultColl.deleteOne({ _id: removeFault._id });
     console.log("Заявка успешно удалена", result);
@@ -849,9 +828,7 @@ export async function updateFaultClaim(info) {
     const result = await faultColl.updateOne(
       { _id: updateFault._id },
       { $set: { isRepair: true } },
-      (err, res) => {
-        console.log(err, res);
-      }
+      (err, res) => {}
     );
     console.log(`A document was updated successfully`, result);
     arrFault = await downloadFaultInfo();

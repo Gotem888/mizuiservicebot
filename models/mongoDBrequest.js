@@ -103,7 +103,6 @@ export async function addLocationToDB() {
 export async function addSectionToDB() {
   const section = generateSectionData(LOCATIONDEN);
   const secColl = myDB.collection("sections");
-  // await Section.create(section);
   for (let sec of section) {
     const addingSec = await Section(sec);
     const result = await secColl.insertOne(addingSec);

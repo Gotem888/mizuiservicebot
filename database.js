@@ -28,10 +28,8 @@ export function GetLocationList(object, info) {
     )(new Set())
   );
   return arr;
-  // console.log(arr);
 }
 export function GetSectionList(object, info) {
-  // console.log(object, info);
   let arr = [];
   let result = [];
   result = object
@@ -43,7 +41,6 @@ export function GetSectionList(object, info) {
     });
 
   arr = arr.flat();
-  // console.log(arr);
 
   return arr;
 }
@@ -54,9 +51,7 @@ export function GetElevatorList(object, idSec) {
 
   result = object.map((e) => {
     if (idSec == e._id) {
-      // if (secInfo == e.section) {
       return e.elevators;
-      // }
     }
   });
 
@@ -65,14 +60,11 @@ export function GetElevatorList(object, idSec) {
   });
   let elevators = [];
   elevators = arr.flat();
-  // arr = arr.flat();
-  // console.log(elevators);
   return elevators;
 }
 
 export function getElevatorInfo(info) {
   let elevList = idsElev.flat();
-  // console.log(elevList);
   let result = [];
 
   elevList
@@ -84,8 +76,6 @@ export function getElevatorInfo(info) {
     });
   let arr = {};
   arr = result[0];
-
-  // console.log(arr, result);
 
   const {
     elevType,
@@ -105,7 +95,6 @@ export function getElevatorInfo(info) {
   else if (elevType == "Cargo") typeElev = "Грузовой";
   if (backdoor == true) doorBack = "Да";
   else doorBack = "Нет";
-  // const head = getElevatorLocation(result2, info);
   const card = `
   '<b><i>${address}</i></b>
   <i>Секция:</i> <b>${section}</b>
@@ -145,7 +134,6 @@ export function getFaults(info) {
     });
   let arr = {};
   arr = result[0];
-  console.log(arr);
 
   const faultCard = (object) => {
     const { _id, elevatorId, isRepair, created_at, text } = object;
@@ -181,11 +169,9 @@ export function getFaults(info) {
   };
 
   let data = faultResult.map((e) => {
-    console.log(faultCard(e));
     return faultCard(e);
   });
   if (!data) data = "Error 404 Not found";
-  console.log(data);
   return data;
 }
 
@@ -211,7 +197,6 @@ export async function getTechInfo(dataQuery) {
       return e;
     }
   });
-  console.log(result);
   let arr = [];
   result.forEach((i) => {
     if (i != undefined) arr.push(i);
@@ -233,55 +218,8 @@ export async function getTechInfo(dataQuery) {
   };
   techList = arr.reduce((acc, item) => {
     acc += techCard(item);
-    console.log(acc);
     return acc;
   }, "");
 
-  console.log(techList);
   return techList;
 }
-// export const queryFaultInfo = (elevId) => {
-//   // console.log(elevId);
-//   bot.action("elevId", async (ctx) => {
-//     await ctx.telegram.sendMessage(
-//       ctx.chat.id,
-//       "Опишите неисправность и отправте сообщение"
-//     );
-//     let faultList = getFaults(elevId);
-//     // console.log(faultList);
-
-//     for await (let e of faultList) {
-//       console.log(typeof e, e);
-//       ctx.telegram.sendMessage(ctx.chat.id, e.substring(0, e.length - 24), {
-//         reply_markup: {
-//           inline_keyboard: [
-//             [
-//               {
-//                 text: "Изменить",
-//                 callback_data: "chFault" + `${e.substring(e.length - 24)}`,
-//               },
-//               {
-//                 text: "Удалить",
-//                 callback_data: "deFault" + `${e.substring(e.length - 24)}`,
-//               },
-//             ],
-//           ],
-//         },
-//       });
-//       console.log(e.substring(e.length - 24));
-//     }
-
-//     bot.on("text", async (ctx) => {
-//       ctx.session = { taskText: `${ctx.message.text}` };
-//       const result = {
-//         text: `${ctx.message.text}`,
-//         elevatorId: elevId,
-//         created_at: new Date().getTime(),
-//       };
-//       await addFaultClaimToDB(result);
-//       ctx.sendMessage("Отметка техобслуживания успешно добавлена");
-//       console.log(`A document was inserted with the _id: ${result.insertedId}`);
-//       // await resultFault.updateOne();
-//     });
-//   });
-// };
