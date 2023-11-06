@@ -298,7 +298,6 @@ bot
             }
 
             const arr = chunkArray(result, 1);
-            console.log(arr);
             arr.push([{ text: "Назад", callback_data: "startOne" }]);
             try {
               ctx.telegram.editMessageText(
@@ -364,7 +363,7 @@ bot
             let arr = [];
             let sectionData = "";
             for (let i = 0; i < secTasks.length; i++) {
-              let secName = secTasks[i].title.substring(0, 1);
+              let secName = secTasks[i].title.split("_")[0];
               let secId = secTasks[i]._id;
               sectionData = "-= " + `${secName}` + " =-";
               for (let t of faultSec) {
