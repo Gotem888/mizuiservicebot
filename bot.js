@@ -196,6 +196,7 @@ bot
       "locatId64fbceb0a93d3ba2ccba1dbb",
       "locatId6548e13b8cee72c0e7d59d5f",
       "locatId6548e13b8cee72c0e7d59d60",
+      "locatId655532f0c96ec1326ff73abb",
       //sections id
       "deFault",
     ],
@@ -430,6 +431,9 @@ bot
             break;
           case `${"locatId6548e13b8cee72c0e7d59d60"}`:
             querySectionData("6548e13b8cee72c0e7d59d60");
+            break;
+          case `${"locatId655532f0c96ec1326ff73abb"}`:
+            querySectionData("655532f0c96ec1326ff73abb");
             break;
         }
       } catch (err) {
