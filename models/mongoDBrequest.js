@@ -81,6 +81,13 @@ export async function downloadFaultInfo() {
   return resultFault;
 }
 
+export async function downloadUsersInfo() {
+  const usersInfo = client.db("mizui_db").collection("users");
+  let resultUsers = usersInfo.find();
+  let result = resultUsers.toArray();
+  return result;
+}
+
 export async function addElevatorToDB() {
   const elevator = generateElevatorData(LOCATIONDEN);
   const elevColl = myDB.collection("elevators");

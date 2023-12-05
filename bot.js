@@ -35,6 +35,7 @@ import {
   downloadFaultInfo,
   downloadSectionInfo,
   downloadTechInfo,
+  downloadUsersInfo,
   queryRequest,
 } from "./models/mongoDBrequest.js";
 
@@ -83,7 +84,12 @@ export let arrElevat = await downloadElevatorInfo();
 export let arrFault = await downloadFaultInfo();
 export let arrLoc = await downloadSectionInfo();
 export let arrTech = await downloadTechInfo();
-
+export let usersInfo = await downloadUsersInfo();
+console.log(usersInfo);
+let usersIds = usersInfo.map((e) => {
+  return e.user;
+});
+console.log(usersIds);
 run().catch(console.dir);
 
 bot.command("coin", (ctx) => {
@@ -141,36 +147,46 @@ const idsElevArr = idsElev.flat().map((e) => {
 let messageId = "";
 if (messageId != "") messageId = "";
 bot.start((ctx) => {
-  ctx.telegram
-    .sendPhoto(
-      ctx.chat.id,
-      "AgACAgIAAxkBAAIbB2UhCr7FnRRYH3cy_ruqXHzrKzoSAAJqzzEbx_QISe4Oc1tU2C8HAQADAgADcwADMAQ",
-      {
-        caption: "Welcome",
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: "Start",
-                callback_data: "start",
-              },
-            ],
-          ],
-        },
-      }
-    )
-    .then((m) => {
-      messageId = m.message_id;
-      let userId = uniqueUserList(userList);
-      for (let i = 0; i < userId.length; i++) {
-        if (userId[i].user == ctx.chat.id) userId[i].mess = m.message_id;
-      }
-      userList.push({ user: ctx.chat.id, mess: m.message_id });
-
-      console.log(ctx.chat.id);
-
-      console.log(uniqueUserList(userList));
+  console.log(usersIds.includes(ctx.chat.id));
+  console.log(typeof ctx.chat.id, ctx.chat.id);
+  if (usersIds.includes(ctx.chat.id.toString()) == false) {
+    ctx.telegram.sendMessage(ctx.chat.id, "Мы - умы, вы - увы...").then((r) => {
+      setTimeout(() => {
+        ctx.deleteMessage(r.message_id);
+      }, 3000);
     });
+  } else {
+    ctx.telegram
+      .sendPhoto(
+        ctx.chat.id,
+        "AgACAgIAAxkBAAIbB2UhCr7FnRRYH3cy_ruqXHzrKzoSAAJqzzEbx_QISe4Oc1tU2C8HAQADAgADcwADMAQ",
+        {
+          caption: "Welcome",
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: "Start",
+                  callback_data: "start",
+                },
+              ],
+            ],
+          },
+        }
+      )
+      .then((m) => {
+        messageId = m.message_id;
+        let userId = uniqueUserList(userList);
+        for (let i = 0; i < userId.length; i++) {
+          if (userId[i].user == ctx.chat.id) userId[i].mess = m.message_id;
+        }
+        userList.push({ user: ctx.chat.id, mess: m.message_id });
+
+        console.log(ctx.chat.id);
+
+        console.log(uniqueUserList(userList));
+      });
+  }
 });
 
 let pastQueryData = [];
