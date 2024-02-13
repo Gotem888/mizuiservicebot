@@ -1,5 +1,5 @@
 # Use Node.js v14
-FROM node:14
+FROM node:18
 
 # Create app directory
 WORKDIR /app
@@ -10,6 +10,8 @@ COPY package.json /app
 
 RUN yarn add
 
-EXPOSE 8080
+RUN yarn run build
+
+EXPOSE 3000
 
 CMD [ "yarn", "start" ]
