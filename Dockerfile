@@ -8,10 +8,8 @@ WORKDIR /app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package.json /app
 
-RUN yarn add
-
-RUN yarn run build
+RUN npm install
 
 EXPOSE 3000
 
-CMD [ "yarn", "start" ]
+CMD [ "npm", "start" ]
