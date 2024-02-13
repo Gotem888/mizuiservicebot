@@ -2,18 +2,15 @@
 FROM node:18
 
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package.json ./
 
-RUN yarn add
-
-# Bundle app source
-COPY . .
+RUN npm install
 
 # Expose the port
 EXPOSE 3000
 
-CMD [ "yarn", "start" ]
+CMD [ "npm", "start" ]
