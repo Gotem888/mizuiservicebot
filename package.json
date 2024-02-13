@@ -2,7 +2,7 @@
   "name": "mizui_bot",
   "version": "1.0.0",
   "description": "Mizui_service_elevators",
-  "main": "index.js",
+  "main": "bot.js",
   "scripts": {
     "start": "nodemon bot.js"
   },
