@@ -10,7 +10,4 @@ COPY package.json ./
 
 RUN npm install
 
-# Expose the port
-EXPOSE 8080
-
 CMD [ "yarn", "start" ]
