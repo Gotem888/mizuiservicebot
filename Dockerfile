@@ -1,15 +1,16 @@
 # Use Node.js v14
-FROM node:14
+FROM node:18
 
 # Create app directory
 WORKDIR /app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package.json /app
+COPY ["package.json", "yarn.lock", "./"]
 
-RUN npm install
+RUN yarn install
 
+# Expose the port
 EXPOSE 8080
 
-CMD [ "yarn", "start" ]
+CMD [ "npm", "start" ]
